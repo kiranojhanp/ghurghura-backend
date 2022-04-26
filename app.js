@@ -1,7 +1,7 @@
 const express = require("express")
 const morgan = require('morgan')
 const createError = require('http-errors')
-const { verifyAccessToken } = require('./helpers/jwt_helpers')
+const { verifyAccessToken } = require('./middlewares/auth.middleware')
 require('./helpers/init_db')
 
 // routes
