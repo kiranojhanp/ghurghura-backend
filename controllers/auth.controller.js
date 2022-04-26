@@ -1,7 +1,7 @@
 const createError = require('http-errors')
 const User = require('../models/user.model')
 const { authSchema } = require('../helpers/validation_schema')
-const { signAccessToken } = require('../helpers/jwt_helpers')
+const { signAccessToken, signRefreshToken, verifyRefreshToken } = require('../helpers/jwt_helpers')
 
 const register = async (req, res, next) => {
   try {
@@ -14,8 +14,10 @@ const register = async (req, res, next) => {
     const user = new User(result)
     const savedUser = await user.save()
     const accessToken = await signAccessToken(savedUser.id)
+    const refreshToken = await signRefreshToken(savedUser.id)
 
-    res.send({ accessToken })
+    res.send({ accessToken, refreshToken })
+
   } catch (error) {
     if (error.isJoi === true) error.status = 422
     next(error)
@@ -33,9 +35,10 @@ const login = async (req, res, next) => {
       throw createError.Unauthorized('Username/password not valid')
 
     const accessToken = await signAccessToken(user.id)
-    console.log(accessToken)
+    const refreshToken = await signRefreshToken(user.id)
 
-    res.send({ accessToken })
+    res.send({ accessToken, refreshToken })
+
   } catch (error) {
     if (error.isJoi === true)
       return next(createError.BadRequest('Invalid Username/Password'))
