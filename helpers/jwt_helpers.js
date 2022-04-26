@@ -87,4 +87,5 @@ const verifyRefreshToken = (refreshToken) => {
     )
   })
 }
+
 module.exports = { signAccessToken, verifyAccessToken, signRefreshToken, verifyRefreshToken }

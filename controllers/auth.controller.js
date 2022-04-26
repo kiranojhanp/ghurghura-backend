@@ -2,6 +2,7 @@ const createError = require('http-errors')
 const User = require('../models/user.model')
 const { authSchema } = require('../helpers/validation_schema')
 const { signAccessToken, signRefreshToken, verifyRefreshToken } = require('../helpers/jwt_helpers')
+const client = require('../helpers/init_redis')
 
 const register = async (req, res, next) => {
   try {
@@ -46,4 +47,36 @@ const login = async (req, res, next) => {
   }
 }
 
-module.exports = { register, login }
+const refreshToken = async (req, res, next) => {
+  try {
+    const { refreshToken } = req.body
+    if (!refreshToken) throw createError.BadRequest()
+    const userId = await verifyRefreshToken(refreshToken)
+
+    const accessToken = await signAccessToken(userId)
+    const refToken = await signRefreshToken(userId)
+    res.send({ accessToken: accessToken, refreshToken: refToken })
+  } catch (error) {
+    next(error)
+  }
+}
+
+const logout = async (req, res, next) => {
+  try {
+    const { refreshToken } = req.body
+    if (!refreshToken) throw createError.BadRequest()
+    const userId = await verifyRefreshToken(refreshToken)
+    client.DEL(userId, (err, val) => {
+      if (err) {
+        console.log(err.message)
+        throw createError.InternalServerError()
+      }
+      console.log(val)
+      res.sendStatus(204)
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+module.exports = { register, login, refreshToken, logout }
