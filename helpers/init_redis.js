@@ -1,3 +1,4 @@
+const { promisify } = require('util')
 const redis = require('redis')
 
 const client = redis.createClient({
@@ -25,4 +26,8 @@ process.on('SIGINT', () => {
   client.quit()
 })
 
-module.exports = client
+// convert callback functions to promise
+const GET_ASYNC = promisify(client.get).bind(client)
+const SET_ASYNC = promisify(client.set).bind(client)
+
+module.exports = { client, GET_ASYNC, SET_ASYNC }

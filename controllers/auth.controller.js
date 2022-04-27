@@ -2,7 +2,7 @@ const createError = require('http-errors')
 const User = require('../models/user.model')
 const { authSchema } = require('../validation/auth.schema')
 const { signAccessToken, signRefreshToken, verifyRefreshToken } = require('../middlewares/auth.middleware')
-const client = require('../helpers/init_redis')
+const { client } = require('../helpers/init_redis')
 
 const register = async (req, res, next) => {
   try {
