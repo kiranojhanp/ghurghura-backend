@@ -2,7 +2,7 @@ const createError = require('http-errors')
 const User = require('../models/user.model')
 const { authSchema } = require('../validation/auth.schema')
 const { signAccessToken, signRefreshToken, verifyRefreshToken } = require('../middlewares/auth.middleware')
-const { client } = require('../helpers/init_redis')
+const { client, DELETE_ASYNC } = require('../helpers/init_redis')
 
 const register = async (req, res, next) => {
   try {
@@ -66,14 +66,17 @@ const logout = async (req, res, next) => {
     const { refreshToken } = req.body
     if (!refreshToken) throw createError.BadRequest()
     const userId = await verifyRefreshToken(refreshToken)
-    client.DEL(userId, (err, val) => {
-      if (err) {
-        console.log(err.message)
-        throw createError.InternalServerError()
-      }
-      console.log(val)
-      res.sendStatus(204)
-    })
+
+    const deleteRefreshToken = await DELETE_ASYNC(userId)
+    if (!deleteRefreshToken) {
+      console.log(err.message)
+      throw createError.InternalServerError()
+    }
+
+    res.statusMessage = "Token invalidated"
+    res.status = 204
+    res.json({ message: "Token invalidated successfully" })
+
   } catch (error) {
     next(error)
   }

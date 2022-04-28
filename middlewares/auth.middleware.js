@@ -1,6 +1,6 @@
 const JWT = require('jsonwebtoken')
 const createError = require('http-errors')
-const { client, SET_ASYNC, GET_ASYNC } = require('../helpers/init_redis')
+const { SET_ASYNC, GET_ASYNC } = require('../helpers/init_redis')
 const { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = process.env
 
 const signAccessToken = (userId) => {
