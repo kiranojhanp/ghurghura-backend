@@ -1,9 +1,10 @@
 const createError = require("http-errors")
 const User = require("../models/user.model")
-const { authSchema } = require("../validation/auth.schema")
+const { authSchema, changePasswordSchema } = require("../validation/auth.schema")
 const { signAccessToken, signRefreshToken, verifyRefreshToken } = require("../middlewares/auth.middleware")
 const { DELETE_ASYNC } = require("../helpers/init_redis")
 
+// @desc register an account , @route POST /auth/register, @access Public
 const register = async (req, res, next) => {
     try {
         const result = await authSchema.validateAsync(req.body)
@@ -25,6 +26,7 @@ const register = async (req, res, next) => {
     }
 }
 
+// @desc login , @route POST /auth/login, @access Public
 const login = async (req, res, next) => {
     try {
         const result = await authSchema.validateAsync(req.body)
@@ -46,6 +48,29 @@ const login = async (req, res, next) => {
     }
 }
 
+// @desc change password , @route POST /auth/change-password, @access Private
+const changePassword = async (req, res, next) => {
+    try {
+        const result = await changePasswordSchema.validateAsync(req.body)
+        const { email, currentPassword, password } = result
+
+        const user = await User.findOne({ email })
+        if (!user) throw createError.NotFound("User not registered")
+
+        const isMatch = await user.isValidPassword(currentPassword)
+        if (!isMatch) throw createError.Unauthorized()
+
+        const changeUserPassword = new User({ email, password })
+        const modifiedUser = await changeUserPassword.save()
+
+        res.send(modifiedUser)
+    } catch (error) {
+        if (error.isJoi === true) return next(createError.BadRequest())
+        next(error)
+    }
+}
+
+// @desc generate new access token , @route POST /auth/refresh-token, @access Private
 const refreshToken = async (req, res, next) => {
     try {
         const { refreshToken } = req.body
@@ -63,6 +88,7 @@ const refreshToken = async (req, res, next) => {
     }
 }
 
+// @desc invalidate refresh token , @route POST /auth/logout, @access Private
 const logout = async (req, res, next) => {
     try {
         const { refreshToken } = req.body
@@ -85,9 +111,21 @@ const logout = async (req, res, next) => {
     }
 }
 
+// @desc get Profile , @route GET /auth/profile, @access Private
+const getProfile = async (req, res, next) => {
+    try {
+        const { aud } = req.payload
+        const user = await User.findById(aud)
+        if (!user) throw new createError.NotFound()
+        res.status(200).json(user)
+    } catch (error) {
+        next(error)
+    }
+}
+
 // Flow for multi device
 // Add new refresh token along with old on every login
 // Remove old refresh token and add new on every /refresh-token
 // Remove old refresh token on every logout
 
-module.exports = { register, login, refreshToken, logout }
+module.exports = { register, login, getProfile, refreshToken, logout, changePassword }
