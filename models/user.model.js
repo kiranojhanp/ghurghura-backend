@@ -1,41 +1,45 @@
-const mongoose = require("mongoose")
-const Schema = mongoose.Schema
-const bcrypt = require('bcrypt')
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
+const bcrypt = require("bcrypt");
 
-const UserSchema = new Schema({
-  email: {
-    type: String,
-    required: true,
-    lowercase: true,
-    unique: true,
+const UserSchema = new Schema(
+  {
+    email: {
+      type: String,
+      required: true,
+      lowercase: true,
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
   },
-  password: {
-    type: String,
-    required: true,
-  },
-})
+  {
+    timestamps: true,
+  }
+);
 
-
-UserSchema.pre('save', async function (next) {
+UserSchema.pre("save", async function (next) {
   try {
     // hash the password only when the document is new
     if (this.isNew) {
-      const salt = await bcrypt.genSalt(10)
-      const hashedPassword = await bcrypt.hash(this.password, salt)
-      this.password = hashedPassword
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(this.password, salt);
+      this.password = hashedPassword;
     }
-    next()
+    next();
   } catch (error) {
-    next(error)
+    next(error);
   }
-})
+});
 
 UserSchema.methods.isValidPassword = async function (password) {
   try {
-    return await bcrypt.compare(password, this.password)
+    return await bcrypt.compare(password, this.password);
   } catch (error) {
-    throw error
+    throw error;
   }
-}
+};
 
 module.exports = mongoose.model("user", UserSchema);
