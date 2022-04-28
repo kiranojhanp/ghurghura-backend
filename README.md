@@ -1,6 +1,7 @@
 ## Introduction
 
 - This is the most secure implementation for jwt based authorization
+- Uses rotating refresh tokens
 - is production ready
 
 ## How it works

@@ -82,4 +82,10 @@ const logout = async (req, res, next) => {
   }
 }
 
+
+// Flow for multi device
+// Add new refresh token along with old on every login
+// Remove old refresh token and add new on every /refresh-token
+// Remove old refresh token on every logout
+
 module.exports = { register, login, refreshToken, logout }
