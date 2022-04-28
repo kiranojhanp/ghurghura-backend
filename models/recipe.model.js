@@ -3,7 +3,6 @@ const Schema = mongoose.Schema
 
 const reviewSchema = mongoose.Schema(
     {
-        name: { type: String, required: true },
         rating: { type: Number, required: true },
         comment: { type: String, required: true },
         user: {
@@ -37,6 +36,11 @@ const RecipeSchema = new Schema(
             required: true,
         },
         reviews: [reviewSchema],
+        numReviews: {
+            type: Number,
+            required: true,
+            default: 0,
+        },
     },
     {
         timestamps: true,

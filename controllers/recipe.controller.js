@@ -74,4 +74,35 @@ const deleteSingleRecipe = async (req, res, next) => {
     }
 }
 
-module.exports = { addRecipe, getRecipes, getSingleRecipe, updateSingleRecipe, deleteSingleRecipe }
+// @desc Add a review , @route GET /recipes/:id/review, @access Private
+const addReview = async (req, res, next) => {
+    try {
+        const { id } = req.params
+        const { aud } = req.payload
+        const { rating, comment } = req.body
+        const recipe = await Recipe.findById(id)
+        if (!recipe) throw new createError.NotFound()
+
+        // allow single review
+        const alreadyReviewed = recipe.reviews.find((item) => item.user.toString() === aud)
+        if (alreadyReviewed) throw new createError.Conflict("You can only review once")
+
+        const review = {
+            rating: Number(rating),
+            comment,
+            user: aud,
+        }
+
+        recipe.reviews.push(review)
+        recipe.numReviews = recipe.reviews.length
+        // [1,2,3,4] => 0 + 1 + 2 + 3 + 4 so, 10/4 = 2.5
+        recipe.rating = recipe.reviews.reduce((acc, item) => item.rating + acc, 0) / recipe.reviews.length
+
+        await recipe.save()
+        res.status(201).json({ message: "Review added" })
+    } catch (error) {
+        next(error)
+    }
+}
+
+module.exports = { addRecipe, getRecipes, getSingleRecipe, updateSingleRecipe, deleteSingleRecipe, addReview }
