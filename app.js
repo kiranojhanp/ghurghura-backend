@@ -4,9 +4,7 @@ const createError = require('http-errors')
 const responseTime = require('response-time')
 const helmet = require('helmet')
 const cors = require('cors')
-const axios = require('axios')
 const { verifyAccessToken } = require('./middlewares/auth.middleware')
-const { SET_ASYNC, GET_ASYNC } = require('./helpers/init_redis')
 require('./helpers/init_db')
 
 // routes
