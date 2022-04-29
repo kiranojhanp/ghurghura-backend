@@ -1,7 +1,7 @@
 const createError = require("http-errors")
 const { recipeSchema } = require("../validation/recipe.schema")
 const Recipe = require("../models/recipe.model")
-const { SET_ASYNC, GET_ASYNC } = require("../helpers/init_redis")
+const { SET_ASYNC, GET_ASYNC } = require("../helpers/init_redis").default
 
 // @desc Add new recipe , @route POST /recipes, @access Private
 const addRecipe = async (req, res, next) => {

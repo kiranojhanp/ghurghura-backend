@@ -1,11 +1,13 @@
-const createError = require("http-errors")
-const User = require("../models/user.model")
-const { authSchema, changePasswordSchema } = require("../validation/auth.schema")
-const { signAccessToken, signRefreshToken, verifyRefreshToken } = require("../middlewares/auth.middleware")
-const { DELETE_ASYNC } = require("../helpers/init_redis")
+import { NextFunction, Request, Response } from "express"
+
+import createError from "http-errors"
+import User from "../models/user.model"
+import { authSchema, changePasswordSchema } from "../validation/auth.schema"
+import { signAccessToken, signRefreshToken, verifyRefreshToken } from "../middlewares/auth.middleware"
+import { DELETE_ASYNC } from "../helpers/init_redis"
 
 // @desc register an account , @route POST /auth/register, @access Public
-const register = async (req, res, next) => {
+const register = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const result = await authSchema.validateAsync(req.body)
         const { email } = result
@@ -26,7 +28,7 @@ const register = async (req, res, next) => {
 }
 
 // @desc login , @route POST /auth/login, @access Public
-const login = async (req, res, next) => {
+const login = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const result = await authSchema.validateAsync(req.body)
         const user = await User.findOne({
@@ -48,7 +50,7 @@ const login = async (req, res, next) => {
 }
 
 // @desc change password , @route POST /auth/change-password, @access Private
-const changePassword = async (req, res, next) => {
+const changePassword = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const result = await changePasswordSchema.validateAsync(req.body)
         const { email, currentPassword, password } = result
@@ -73,7 +75,7 @@ const changePassword = async (req, res, next) => {
 }
 
 // @desc generate new access token , @route POST /auth/refresh-token, @access Private
-const refreshToken = async (req, res, next) => {
+const refreshToken = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { refreshToken } = req.body
         if (!refreshToken) throw new createError.BadRequest()
@@ -91,7 +93,7 @@ const refreshToken = async (req, res, next) => {
 }
 
 // @desc invalidate refresh token , @route POST /auth/logout, @access Private
-const logout = async (req, res, next) => {
+const logout = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { refreshToken } = req.body
         if (!refreshToken) throw new createError.BadRequest()
@@ -102,18 +104,14 @@ const logout = async (req, res, next) => {
             throw new createError.InternalServerError()
         }
 
-        res.statusMessage = "Token invalidated"
-        res.status = 204
-        res.json({
-            message: "Token invalidated successfully",
-        })
+        res.status(204).json({ message: "Token invalidated successfully" })
     } catch (error) {
         next(error)
     }
 }
 
 // @desc get Profile , @route GET /auth/profile, @access Private
-const getProfile = async (req, res, next) => {
+const getProfile = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { aud } = req.payload
         const user = await User.findById(aud)
@@ -129,4 +127,4 @@ const getProfile = async (req, res, next) => {
 // Remove old refresh token and add new on every /refresh-token
 // Remove old refresh token on every logout
 
-module.exports = { register, login, getProfile, refreshToken, logout, changePassword }
+export { register, login, getProfile, refreshToken, logout, changePassword }
