@@ -1,0 +1,26 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "rootDir": "src",
+        "outDir": "dist",
+        "moduleResolution": "node",
+        "strict": true,
+        "noImplicitAny": false,
+        "strictNullChecks": true,
+        "checkJs": true,
+        "allowJs": true,
+        "types": ["node"],
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "allowUnreachableCode": true,
+        "useUnknownInCatchVariables": false,
+        "typeRoots": ["./node_modules/@types", "./src/types"]
+    },
+    "include": ["src/**/*.ts", "src/**/*.js"],
+    "exclude": ["node_modules", "<node_internals>/**"]
+    // "ts-node": {
+    // 	"swc": true
+    // }
+}
