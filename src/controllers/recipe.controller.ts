@@ -22,7 +22,7 @@ const addRecipe = async (req: Request, res: Response, next: NextFunction) => {
 // @desc Fetch all recipes , @route GET /recipes, @access Public
 const getRecipes = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const reply = await GET_ASYNC("recipes")
+        const reply = (await GET_ASYNC("recipes")) as any
         if (reply) {
             res.send(JSON.parse(reply))
             return
@@ -30,7 +30,7 @@ const getRecipes = async (req: Request, res: Response, next: NextFunction) => {
 
         const recipes = await Recipe.find()
         if (!recipes) throw new createError.NotFound()
-        await SET_ASYNC("recipes", JSON.stringify(recipes), "EX", 15)
+        await SET_ASYNC("recipes", JSON.stringify(recipes), 15)
 
         res.send(recipes)
     } catch (error) {
@@ -43,7 +43,7 @@ const getSingleRecipe = async (req: Request, res: Response, next: NextFunction) 
     try {
         const { id } = req.params
 
-        const reply = await GET_ASYNC(`recipe-${id}`)
+        const reply = (await GET_ASYNC(`recipe-${id}`)) as any
         if (reply) {
             res.send(JSON.parse(reply))
             return
@@ -51,7 +51,7 @@ const getSingleRecipe = async (req: Request, res: Response, next: NextFunction) 
 
         const recipe = await Recipe.findById(id)
         if (!recipe) throw new createError.NotFound(`Recipe of id:"${id}" not found`)
-        await SET_ASYNC(`recipe-${id}`, JSON.stringify(recipe), "EX", 15)
+        await SET_ASYNC(`recipe-${id}`, JSON.stringify(recipe), 15)
 
         res.send(recipe)
     } catch (error) {

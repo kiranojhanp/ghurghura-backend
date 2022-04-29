@@ -41,6 +41,7 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
 
         const accessToken = await signAccessToken(user.id)
         const refreshToken = await signRefreshToken(user.id)
+        console.log("Running till here")
 
         res.send({ accessToken, refreshToken })
     } catch (error) {
@@ -81,8 +82,8 @@ const refreshToken = async (req: Request, res: Response, next: NextFunction) => 
         if (!refreshToken) throw new createError.BadRequest()
         const userId = await verifyRefreshToken(refreshToken)
 
-        const accessToken = await signAccessToken(userId)
-        const refToken = await signRefreshToken(userId)
+        const accessToken = await signAccessToken(userId as string)
+        const refToken = await signRefreshToken(userId as string)
         res.send({
             accessToken: accessToken,
             refreshToken: refToken,

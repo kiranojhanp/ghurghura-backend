@@ -57,7 +57,8 @@ const signRefreshToken = (userId: string) => {
             }
 
             try {
-                const saveResult = await SET_ASYNC(userId, token, "EX", 365 * 24 * 60 * 60)
+                // const saveResult = await SET_ASYNC(userId, token, "EX", 365 * 24 * 60 * 60)
+                const saveResult = await SET_ASYNC(userId, token as string, 365 * 24 * 60 * 60)
                 if (saveResult) return resolve(token)
             } catch (err) {
                 console.log(err.message)
