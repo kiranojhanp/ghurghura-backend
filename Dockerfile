@@ -1,13 +1,19 @@
-FROM node:16-alpine
-WORKDIR /usr/src/app
+FROM node:16-alpine as base
 
-# install packages
-COPY package*.json ./
-RUN npm ci
-
-# copy everything
-COPY . .
-
-# start the server
+WORKDIR /src
+COPY package*.json /
 EXPOSE 8080
-CMD [ "npm", "start" ]
+
+# For production
+FROM base as production
+ENV NODE_ENV=production
+RUN npm ci
+COPY . .
+CMD ["npm", "start"]
+
+# From development
+FROM base as dev
+ENV NODE_ENV=development
+RUN npm install -g nodemon && npm install
+COPY . .
+CMD ["npm", "run", "dev"]

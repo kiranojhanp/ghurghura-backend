@@ -1,0 +1,49 @@
+version: '3.9'
+
+services:
+  # mongoDB service
+  mongo_db:
+    container_name: db_container
+    platform: linux/amd64
+    image: 'mongo:latest'
+    restart: always
+    ports:
+      - 2717:27017
+    volumes:
+      - 'mongo_db:/data/db'
+
+  # redis service
+  cache:
+    container_name: redis_container
+    platform: linux/amd64
+    image: 'redis:6.2-alpine'
+    restart: always
+    ports:
+      - 6379:6379
+    command: redis-server --save 20 1 --loglevel warning
+    volumes:
+      - cache:/data
+
+  # Node API service
+  api:
+    image: kiranojhanp/ghurghura-backend
+    platform: linux/amd64
+    build: .
+    ports:
+      - 8080:8080
+    volumes:
+      - .:/usr/src/app
+    environment:
+      NODE_ENV: production
+      PORT: 8080
+      MONGODB_URI: 'mongodb://mongo_db:27017'
+      DB_NAME: ghurghura
+      NAME: KiranOjha
+      REDIS_HOST: "redis://cache:6379"
+    depends_on:
+      - mongo_db
+      - cache
+
+volumes:
+  mongo_db: {}
+  cache: {}
