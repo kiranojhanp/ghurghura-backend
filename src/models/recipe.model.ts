@@ -1,12 +1,11 @@
-const mongoose = require("mongoose")
-const Schema = mongoose.Schema
+import mongoose, { Schema } from "mongoose"
 
-const reviewSchema = mongoose.Schema(
+const reviewSchema = new Schema(
     {
         rating: { type: Number, required: true },
         comment: { type: String, required: true },
         user: {
-            type: mongoose.Schema.Types.ObjectId,
+            type: Schema.Types.ObjectId,
             required: true,
             ref: "user",
         },
@@ -19,7 +18,7 @@ const reviewSchema = mongoose.Schema(
 const RecipeSchema = new Schema(
     {
         user: {
-            type: mongoose.Schema.Types.ObjectId,
+            type: Schema.Types.ObjectId,
             required: true,
             ref: "user",
         },
@@ -47,4 +46,5 @@ const RecipeSchema = new Schema(
     }
 )
 
-module.exports = mongoose.model("recipe", RecipeSchema)
+const Recipe = mongoose.model("recipe", RecipeSchema)
+export default Recipe
