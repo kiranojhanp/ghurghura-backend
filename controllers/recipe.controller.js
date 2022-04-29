@@ -1,6 +1,7 @@
 const createError = require("http-errors")
 const { recipeSchema } = require("../validation/recipe.schema")
 const Recipe = require("../models/recipe.model")
+const { SET_ASYNC, GET_ASYNC } = require("../helpers/init_redis")
 
 // @desc Add new recipe , @route POST /recipes, @access Private
 const addRecipe = async (req, res, next) => {
@@ -20,8 +21,16 @@ const addRecipe = async (req, res, next) => {
 // @desc Fetch all recipes , @route GET /recipes, @access Public
 const getRecipes = async (req, res, next) => {
     try {
+        const reply = await GET_ASYNC("recipes")
+        if (reply) {
+            res.send(JSON.parse(reply))
+            return
+        }
+
         const recipes = await Recipe.find()
         if (!recipes) throw new createError.NotFound()
+        await SET_ASYNC("recipes", JSON.stringify(recipes), "EX", 15)
+
         res.send(recipes)
     } catch (error) {
         next(error)
@@ -32,8 +41,17 @@ const getRecipes = async (req, res, next) => {
 const getSingleRecipe = async (req, res, next) => {
     try {
         const { id } = req.params
+
+        const reply = await GET_ASYNC(`recipe-${id}`)
+        if (reply) {
+            res.send(JSON.parse(reply))
+            return
+        }
+
         const recipe = await Recipe.findById(id)
         if (!recipe) throw new createError.NotFound(`Recipe of id:"${id}" not found`)
+        await SET_ASYNC(`recipe-${id}`, JSON.stringify(recipe), "EX", 15)
+
         res.send(recipe)
     } catch (error) {
         next(error)

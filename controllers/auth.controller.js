@@ -8,9 +8,8 @@ const { DELETE_ASYNC } = require("../helpers/init_redis")
 const register = async (req, res, next) => {
     try {
         const result = await authSchema.validateAsync(req.body)
-        const doesExist = await User.findOne({
-            email: result.email,
-        })
+        const { email } = result
+        const doesExist = await User.findOne({ email })
 
         if (doesExist) throw createError.Conflict(`${result.email} is already been registered`)
 
@@ -60,10 +59,13 @@ const changePassword = async (req, res, next) => {
         const isMatch = await user.isValidPassword(currentPassword)
         if (!isMatch) throw createError.Unauthorized()
 
-        const changeUserPassword = new User({ email, password })
-        const modifiedUser = await changeUserPassword.save()
+        user.password = password
 
-        res.send(modifiedUser)
+        const savedUser = await user.save()
+        const accessToken = await signAccessToken(savedUser.id)
+        const refreshToken = await signRefreshToken(savedUser.id)
+
+        res.send({ accessToken, refreshToken })
     } catch (error) {
         if (error.isJoi === true) return next(createError.BadRequest())
         next(error)
