@@ -1,8 +1,8 @@
 import createHttpError from "http-errors"
 import * as redis from "redis"
-const { REDIS_HOST } = process.env as { [key: string]: string }
+const { REDIS_HOST, REDIS_PORT } = process.env as { [key: string]: string }
 
-const client = redis.createClient({ url: `${REDIS_HOST}` })
+const client = redis.createClient({ url: `redis://${REDIS_HOST}:${REDIS_PORT}` })
 client.connect()
 
 client.on("connect", () => {
