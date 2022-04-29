@@ -4,9 +4,10 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "prestart": "npx npx tsc && rsync -aP --exclude='*.ts' ./src/* ./dist/",
-        "start": "node src/index.js",
-        "dev": "nodemon src/index.ts"
+        "prestart": "npx npx tsc && npm run syncRemainingFilesToDist",
+        "start": "node dist/index.js",
+        "dev": "nodemon",
+        "syncRemainingFilesToDist": "rsync -aP --exclude-from='exclude_rsync.txt' ./src/* ./dist/"
     },
     "keywords": [],
     "author": "",
