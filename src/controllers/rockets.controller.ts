@@ -1,7 +1,8 @@
-const axios = require("axios")
-const { SET_ASYNC, GET_ASYNC } = require("../helpers/init_redis").default
+import axios from "axios"
+import { NextFunction, Request, Response } from "express"
+import { SET_ASYNC, GET_ASYNC } from "../helpers/init_redis"
 
-const getRockets = async (req, res, next) => {
+const getRockets = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const reply = await GET_ASYNC("rockets")
         if (reply) {
@@ -18,7 +19,7 @@ const getRockets = async (req, res, next) => {
     }
 }
 
-const getSingleRocket = async (req, res, next) => {
+const getSingleRocket = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params
         const reply = await GET_ASYNC(`rocket-${id}`)
@@ -36,4 +37,4 @@ const getSingleRocket = async (req, res, next) => {
     }
 }
 
-module.exports = { getRockets, getSingleRocket }
+export { getRockets, getSingleRocket }

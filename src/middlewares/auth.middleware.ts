@@ -1,9 +1,11 @@
-const JWT = require("jsonwebtoken")
-const createError = require("http-errors")
-const { SET_ASYNC, GET_ASYNC } = require("../helpers/init_redis")
+import { NextFunction, Request, Response } from "express"
+
+import JWT from "jsonwebtoken"
+import createError from "http-errors"
+import { SET_ASYNC, GET_ASYNC } from "../helpers/init_redis"
 const { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = process.env as { [key: string]: string }
 
-const signAccessToken = (userId) => {
+const signAccessToken = (userId: string) => {
     return new Promise((resolve, reject) => {
         const payload = {}
         const secret = ACCESS_TOKEN_SECRET
@@ -19,11 +21,12 @@ const signAccessToken = (userId) => {
                 return
             }
             resolve(token)
+            // 0387952493452401 ramailo branch apsara bajagain
         })
     })
 }
 
-const verifyAccessToken = (req, res, next) => {
+const verifyAccessToken = (req: Request, res: Response, next: NextFunction) => {
     if (!req.headers["authorization"]) return next(new createError.Unauthorized())
     const authHeader = req.headers["authorization"]
     const bearerToken = authHeader.split(" ")
@@ -38,7 +41,7 @@ const verifyAccessToken = (req, res, next) => {
     })
 }
 
-const signRefreshToken = (userId) => {
+const signRefreshToken = (userId: string) => {
     return new Promise((resolve, reject) => {
         const payload = {}
         const secret = REFRESH_TOKEN_SECRET
@@ -64,7 +67,7 @@ const signRefreshToken = (userId) => {
     })
 }
 
-const verifyRefreshToken = (refreshToken) => {
+const verifyRefreshToken = (refreshToken: string) => {
     return new Promise((resolve, reject) => {
         JWT.verify(refreshToken, REFRESH_TOKEN_SECRET, async (err, payload) => {
             if (err) return reject(new createError.Unauthorized())

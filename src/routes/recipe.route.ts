@@ -15,4 +15,4 @@ router.get("/:id", getSingleRecipe)
 router.put("/:id", verifyAccessToken, updateSingleRecipe)
 router.delete("/:id", verifyAccessToken, deleteSingleRecipe)
 
-module.exports = router
+export default router
