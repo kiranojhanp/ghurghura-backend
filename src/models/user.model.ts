@@ -1,4 +1,4 @@
-import mongoose, { Schema, Model, Document } from "mongoose"
+import { Schema, Model, Document, model } from "mongoose"
 import { HASH_ASYNC, HASH_COMPARE_ASYNC } from "../helpers/bcrypt_async"
 
 interface IUserDocument extends Document {
@@ -53,5 +53,5 @@ UserSchema.methods.isValidPassword = async function (password: string) {
     }
 }
 
-const User = mongoose.model<IUser>("user", UserSchema)
+const User = model<IUser>("user", UserSchema)
 export default User

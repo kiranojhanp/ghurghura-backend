@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose"
+import { Schema, model } from "mongoose"
 
 const reviewSchema = new Schema(
     {
@@ -46,5 +46,5 @@ const RecipeSchema = new Schema(
     }
 )
 
-const Recipe = mongoose.model("recipe", RecipeSchema)
+const Recipe = model("recipe", RecipeSchema)
 export default Recipe
