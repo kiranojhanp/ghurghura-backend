@@ -80,6 +80,8 @@ const refreshToken = async (req: Request, res: Response, next: NextFunction) => 
     try {
         const { refreshToken } = req.body
         if (!refreshToken) throw new createError.BadRequest()
+        console.log("Upto here")
+
         const userId = await verifyRefreshToken(refreshToken)
 
         const accessToken = await signAccessToken(userId as string)
@@ -98,7 +100,7 @@ const logout = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { refreshToken } = req.body
         if (!refreshToken) throw new createError.BadRequest()
-        const userId = await verifyRefreshToken(refreshToken)
+        const userId = (await verifyRefreshToken(refreshToken)) as string
 
         const deleteRefreshToken = await DELETE_ASYNC(userId)
         if (!deleteRefreshToken) {
