@@ -69,7 +69,7 @@ const signRefreshToken = (userId: string) => {
 
 const verifyRefreshToken = (refreshToken: string) => {
     return new Promise((resolve, reject) => {
-        JWT.verify(refreshToken, REFRESH_TOKEN_SECRET, async (err, payload) => {
+        JWT.verify(refreshToken, REFRESH_TOKEN_SECRET, async (err, payload: any) => {
             if (err) return reject(new createError.Unauthorized())
             const userId = payload.aud
 

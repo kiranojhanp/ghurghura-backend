@@ -1,4 +1,4 @@
-import express from "express"
+import express, { ErrorRequestHandler, Application } from "express"
 import morgan from "morgan"
 import createError from "http-errors"
 import responseTime from "response-time"
@@ -12,7 +12,7 @@ import AuthRoute from "./routes/auth.route"
 import RocketsRoute from "./routes/rockets.route"
 import RecipeRoute from "./routes/recipe.route"
 
-const app = express()
+const app: Application = express()
 
 app.use(cors())
 app.use(helmet())
@@ -35,7 +35,7 @@ app.use(async (req, res, next) => {
     next(new createError.NotFound())
 })
 
-app.use((err, req, res, next) => {
+const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
     res.status(err.status || 500)
     res.send({
         error: {
@@ -43,6 +43,8 @@ app.use((err, req, res, next) => {
             message: err.message,
         },
     })
-})
+}
+
+app.use(errorHandler)
 
 export default app
