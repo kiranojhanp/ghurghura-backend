@@ -1,16 +1,16 @@
-const express = require("express")
-const morgan = require("morgan")
-const createError = require("http-errors")
-const responseTime = require("response-time")
-const helmet = require("helmet")
-const cors = require("cors")
-const { verifyAccessToken } = require("./middlewares/auth.middleware")
+import express from "express"
+import morgan from "morgan"
+import createError from "http-errors"
+import responseTime from "response-time"
+import helmet from "helmet"
+import cors from "cors"
+import { verifyAccessToken } from "./middlewares/auth.middleware"
 require("./helpers/init_db")
 
 // routes
-const AuthRoute = require("./routes/auth.route")
-const RocketsRoute = require("./routes/rockets.route")
-const RecipeRoute = require("./routes/recipe.route")
+import AuthRoute from "./routes/auth.route"
+import RocketsRoute from "./routes/rockets.route"
+import RecipeRoute from "./routes/recipe.route"
 
 const app = express()
 
@@ -32,7 +32,7 @@ app.use("/rockets", RocketsRoute)
 
 // error handlers
 app.use(async (req, res, next) => {
-    next(createError.NotFound())
+    next(new createError.NotFound())
 })
 
 app.use((err, req, res, next) => {
@@ -45,4 +45,4 @@ app.use((err, req, res, next) => {
     })
 })
 
-module.exports = app
+export default app
