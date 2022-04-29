@@ -1,13 +1,13 @@
-const express = require("express")
+import express from "express"
 const router = express.Router()
-const { verifyAccessToken } = require("../middlewares/auth.middleware")
-const {
+import { verifyAccessToken } from "../middlewares/auth.middleware"
+import {
     addRecipe,
     getRecipes,
     getSingleRecipe,
     updateSingleRecipe,
     deleteSingleRecipe,
-} = require("../controllers/recipe.controller")
+} from "../controllers/recipe.controller"
 
 router.get("/", getRecipes)
 router.post("/", verifyAccessToken, addRecipe)

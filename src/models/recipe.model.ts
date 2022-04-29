@@ -1,6 +1,7 @@
 import { Schema, model } from "mongoose"
+import { IRecipeReview, IRecipe } from "../types/recipe.types"
 
-const reviewSchema = new Schema(
+const reviewSchema = new Schema<IRecipeReview>(
     {
         rating: { type: Number, required: true },
         comment: { type: String, required: true },
@@ -15,7 +16,7 @@ const reviewSchema = new Schema(
     }
 )
 
-const RecipeSchema = new Schema(
+const RecipeSchema = new Schema<IRecipe>(
     {
         user: {
             type: Schema.Types.ObjectId,
@@ -35,6 +36,11 @@ const RecipeSchema = new Schema(
             required: true,
         },
         reviews: [reviewSchema],
+        rating: {
+            type: Number,
+            required: true,
+            default: 0,
+        },
         numReviews: {
             type: Number,
             required: true,
