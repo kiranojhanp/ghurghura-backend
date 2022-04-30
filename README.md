@@ -21,8 +21,8 @@
 ## What has refresh token solved?
 
 - Better user experience for client as no need to fill login form every hour
-- Can generate access key without any connecting to our (expensive) database
-- Highly secure and industry standard
+- Can generate access key without any connecting to database
+- Highly secure
 
 ## What if refresh token gets stolen?
 
@@ -40,4 +40,4 @@
 
 ## Roadmap
 
-- Redis Zset will soon be used so, users from multiple devices can login simultaneously.
+- Redis Zset will soon be used to store refresh tokens so, users from multiple devices can login simultaneously.
