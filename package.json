@@ -4,7 +4,7 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "build": "npx npx tsc",
+        "prestart": "npx tsc",
         "start": "node dist/index.js",
         "dev": "nodemon",
         "syncRemainingFilesToDist": "cp src/views dist/views"
@@ -33,7 +33,6 @@
         "@types/http-errors": "^1.8.2",
         "@types/jsonwebtoken": "^8.5.8",
         "@types/morgan": "^1.9.3",
-        "@types/redis": "^4.0.11",
         "@types/response-time": "^2.3.5",
         "morgan": "^1.10.0",
         "ts-node": "^10.7.0",
