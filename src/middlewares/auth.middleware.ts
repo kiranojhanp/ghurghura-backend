@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express"
 import createError from "http-errors"
 import JWT from "jsonwebtoken"
-import { GET_ASYNC, SET_ASYNC } from "../helpers/init_redis"
+import { client } from "../helpers/init_redis"
 
 const { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = process.env as { [key: string]: string }
 
@@ -58,7 +58,9 @@ const signRefreshToken = (userId: string) => {
 
             try {
                 // const saveResult = await SET_ASYNC(userId, token, "EX", 365 * 24 * 60 * 60)
-                const saveResult = await SET_ASYNC(userId, token as string, 365 * 24 * 60 * 60)
+
+                const saveResult = await client.setEx(userId, 365 * 24 * 60 * 60, token as string)
+
                 if (saveResult) return resolve(token)
             } catch (err) {
                 console.log(err.message)
@@ -75,7 +77,8 @@ const verifyRefreshToken = (refreshToken: string) => {
             const userId = payload.aud
 
             try {
-                const getRefreshToken = await GET_ASYNC(userId)
+                const getRefreshToken = await client.GET(userId)
+
                 if (refreshToken === getRefreshToken) return resolve(userId)
                 reject(new createError.Unauthorized())
             } catch (err) {

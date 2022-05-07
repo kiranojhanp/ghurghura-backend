@@ -1,6 +1,6 @@
 export interface IRecipeReview {
-    rating: Number
-    comment: String
+    rating: number
+    comment: string
     user: string | any
 }
 
@@ -8,8 +8,8 @@ export interface IRecipe {
     user: string | any
     name: string
     description: string
-    price: Number
+    price: number
     reviews: IRecipeReview[]
-    rating: Number
-    numReviews: Number
+    rating: number
+    numReviews: number
 }

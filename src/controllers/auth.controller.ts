@@ -1,10 +1,9 @@
 import { NextFunction, Request, Response } from "express"
-
 import createError from "http-errors"
+import { client } from "../helpers/init_redis"
+import { signAccessToken, signRefreshToken, verifyRefreshToken } from "../middlewares/auth.middleware"
 import User from "../models/user.model"
 import { authSchema, changePasswordSchema } from "../validation/auth.schema"
-import { signAccessToken, signRefreshToken, verifyRefreshToken } from "../middlewares/auth.middleware"
-import { DELETE_ASYNC } from "../helpers/init_redis"
 
 // @desc register an account , @route POST /auth/register, @access Public
 const register = async (req: Request, res: Response, next: NextFunction) => {
@@ -82,10 +81,10 @@ const refreshToken = async (req: Request, res: Response, next: NextFunction) => 
         if (!refreshToken) throw new createError.BadRequest()
         console.log("Upto here")
 
-        const userId = await verifyRefreshToken(refreshToken)
+        const userId = (await verifyRefreshToken(refreshToken)) as string
+        const accessToken = await signAccessToken(userId)
+        const refToken = await signRefreshToken(userId)
 
-        const accessToken = await signAccessToken(userId as string)
-        const refToken = await signRefreshToken(userId as string)
         res.send({
             accessToken: accessToken,
             refreshToken: refToken,
@@ -102,7 +101,7 @@ const logout = async (req: Request, res: Response, next: NextFunction) => {
         if (!refreshToken) throw new createError.BadRequest()
         const userId = (await verifyRefreshToken(refreshToken)) as string
 
-        const deleteRefreshToken = await DELETE_ASYNC(userId)
+        const deleteRefreshToken = await client.DEL(userId)
         if (!deleteRefreshToken) {
             throw new createError.InternalServerError()
         }

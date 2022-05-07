@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express"
 import createError from "http-errors"
-import { recipeSchema } from "../validation/recipe.schema"
+import { client } from "../helpers/init_redis"
 import Recipe from "../models/recipe.model"
-import { SET_ASYNC, GET_ASYNC } from "../helpers/init_redis"
+import { recipeSchema } from "../validation/recipe.schema"
 
 // @desc Add new recipe , @route POST /recipes, @access Private
 const addRecipe = async (req: Request, res: Response, next: NextFunction) => {
@@ -12,6 +12,9 @@ const addRecipe = async (req: Request, res: Response, next: NextFunction) => {
         const result = await recipeSchema.validateAsync({ user, name, description, price })
         const recipe = new Recipe(result)
         const saveRecipe = await recipe.save()
+
+        if (saveRecipe) await client.SETEX(`recipe-${saveRecipe.id}`, 15, JSON.stringify(saveRecipe))
+
         res.status(201).json(saveRecipe)
     } catch (error) {
         if (error.isJoi === true) error.status = 422
@@ -22,7 +25,7 @@ const addRecipe = async (req: Request, res: Response, next: NextFunction) => {
 // @desc Fetch all recipes , @route GET /recipes, @access Public
 const getRecipes = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const reply = (await GET_ASYNC("recipes")) as any
+        const reply = await client.GET("recipes")
         if (reply) {
             res.send(JSON.parse(reply))
             return
@@ -30,7 +33,7 @@ const getRecipes = async (req: Request, res: Response, next: NextFunction) => {
 
         const recipes = await Recipe.find()
         if (!recipes) throw new createError.NotFound()
-        await SET_ASYNC("recipes", JSON.stringify(recipes), 15)
+        await client.setEx("recipes", 15, JSON.stringify(recipes))
 
         res.send(recipes)
     } catch (error) {
@@ -43,7 +46,7 @@ const getSingleRecipe = async (req: Request, res: Response, next: NextFunction) 
     try {
         const { id } = req.params
 
-        const reply = (await GET_ASYNC(`recipe-${id}`)) as any
+        const reply = await client.GET(`recipe-${id}`)
         if (reply) {
             res.send(JSON.parse(reply))
             return
@@ -51,7 +54,7 @@ const getSingleRecipe = async (req: Request, res: Response, next: NextFunction) 
 
         const recipe = await Recipe.findById(id)
         if (!recipe) throw new createError.NotFound(`Recipe of id:"${id}" not found`)
-        await SET_ASYNC(`recipe-${id}`, JSON.stringify(recipe), 15)
+        await client.setEx(`recipe-${id}`, 15, JSON.stringify(recipe))
 
         res.send(recipe)
     } catch (error) {
@@ -115,7 +118,7 @@ const addReview = async (req: Request, res: Response, next: NextFunction) => {
         recipe.reviews.push(review)
         recipe.numReviews = recipe.reviews.length
         // [1,2,3,4] => 0 + 1 + 2 + 3 + 4 so, 10/4 = 2.5
-        recipe.rating = recipe.reviews.reduce((acc, item) => (item.rating as number) + acc, 0) / recipe.reviews.length
+        recipe.rating = recipe.reviews.reduce((acc, item) => item.rating + acc, 0) / recipe.reviews.length
 
         await recipe.save()
         res.status(201).json({ message: "Review added" })

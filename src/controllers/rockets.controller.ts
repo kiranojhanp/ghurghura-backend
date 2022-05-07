@@ -1,17 +1,18 @@
 import axios from "axios"
 import { NextFunction, Request, Response } from "express"
-import { SET_ASYNC, GET_ASYNC } from "../helpers/init_redis"
+import { client } from "../helpers/init_redis"
 
 const getRockets = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const reply = (await GET_ASYNC("rockets")) as any
+        const reply = await client.GET(`rockets`)
+
         if (reply) {
             res.send(JSON.parse(reply))
             return
         }
 
         const response = await axios.get("https://api.spacexdata.com/v4/rockets")
-        await SET_ASYNC("rockets", JSON.stringify(response.data), 5)
+        await client.setEx("recipes", 15, JSON.stringify(response.data))
 
         res.send(response.data)
     } catch (error) {
@@ -22,14 +23,14 @@ const getRockets = async (req: Request, res: Response, next: NextFunction) => {
 const getSingleRocket = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params
-        const reply = (await GET_ASYNC(`rocket-${id}`)) as any
+        const reply = await client.GET(`rocket-${id}`)
         if (reply) {
             res.send(JSON.parse(reply))
             return
         }
 
         const response = await axios.get(`https://api.spacexdata.com/v4/rockets/${id}`)
-        await SET_ASYNC(`rocket-${id}`, JSON.stringify(response.data), 5)
+        await client.setEx(`rocket-${id}`, 15, JSON.stringify(response.data))
 
         res.send(response.data)
     } catch (error) {
