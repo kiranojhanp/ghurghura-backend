@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express"
-
-import JWT from "jsonwebtoken"
 import createError from "http-errors"
-import { SET_ASYNC, GET_ASYNC } from "../helpers/init_redis"
+import JWT from "jsonwebtoken"
+import { GET_ASYNC, SET_ASYNC } from "../helpers/init_redis"
+
 const { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = process.env as { [key: string]: string }
 
 const signAccessToken = (userId: string) => {

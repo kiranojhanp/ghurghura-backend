@@ -3,27 +3,18 @@ import * as redis from "redis"
 const { REDIS_HOST, REDIS_PORT } = process.env as { [key: string]: string }
 
 const client = redis.createClient({ url: `redis://${REDIS_HOST}:${REDIS_PORT}` })
-client.connect()
 
-client.on("connect", () => {
-    console.log("Client connected to redis...")
-})
+const run = async () => {
+    client.on("connect", () => console.log("Client connected to redis..."))
+    client.on("ready", async () => console.log("Client connected to redis and ready to use..."))
+    client.on("error", (err) => console.log(err.message))
+    client.on("end", () => console.log("Client disconnected from redis"))
+    process.on("SIGINT", () => client.quit())
+    await client.connect()
+    await client.ping()
+}
 
-client.on("ready", () => {
-    console.log("Client connected to redis and ready to use...")
-})
-
-client.on("error", (err) => {
-    console.log(err.message)
-})
-
-client.on("end", () => {
-    console.log("Client disconnected from redis")
-})
-
-process.on("SIGINT", () => {
-    client.quit()
-})
+run()
 
 // convert sync functions to promise
 export const GET_ASYNC = async (key: string) => {

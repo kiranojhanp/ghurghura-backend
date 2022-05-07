@@ -1,16 +1,15 @@
-import express, { ErrorRequestHandler, Application } from "express"
-import morgan from "morgan"
-import createError from "http-errors"
-import responseTime from "response-time"
-import helmet from "helmet"
 import cors from "cors"
+import express, { Application, ErrorRequestHandler } from "express"
+import helmet from "helmet"
+import createError from "http-errors"
+import morgan from "morgan"
+import responseTime from "response-time"
 import { verifyAccessToken } from "./middlewares/auth.middleware"
-require("./helpers/init_db")
-
 // routes
 import AuthRoute from "./routes/auth.route"
-import RocketsRoute from "./routes/rockets.route"
 import RecipeRoute from "./routes/recipe.route"
+import RocketsRoute from "./routes/rockets.route"
+require("./helpers/init_db")
 
 const app: Application = express()
 
