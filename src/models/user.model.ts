@@ -1,4 +1,6 @@
-import { Schema, Model, Document, model } from "mongoose"
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable no-useless-catch */
+import { Document, Model, model, Schema } from "mongoose"
 import { HASH_ASYNC, HASH_COMPARE_ASYNC } from "../helpers/bcrypt_async"
 
 interface IUserDocument extends Document {
@@ -10,7 +12,7 @@ interface IUser extends IUserDocument {
     isValidPassword: (password: string) => Promise<boolean>
 }
 
-interface IUserModel extends Model<IUserDocument, {}> {}
+type IUserModel = Model<IUserDocument, {}>
 
 const UserSchema = new Schema<IUser, IUserModel>(
     {
