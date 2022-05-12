@@ -1,7 +1,7 @@
 import { Router } from "express"
-const router = Router()
+import { changePassword, getProfile, login, logout, refreshToken, register } from "../controllers/auth.controller"
 import { verifyAccessToken } from "../middlewares/auth.middleware"
-import { register, login, refreshToken, logout, getProfile, changePassword } from "../controllers/auth.controller"
+const router = Router()
 
 router.post("/register", register)
 router.post("/login", login)

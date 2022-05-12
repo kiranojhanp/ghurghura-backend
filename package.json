@@ -4,6 +4,10 @@
     "description": "",
     "main": "index.js",
     "scripts": {
+        "format:check": "prettier --check .",
+        "format:write": "prettier --write .",
+        "lint:check": "eslint .",
+        "lint:fix": "eslint --fix .",
         "prestart": "npx tsc",
         "start": "node dist/index.js",
         "dev": "nodemon",
@@ -34,7 +38,12 @@
         "@types/jsonwebtoken": "^8.5.8",
         "@types/morgan": "^1.9.3",
         "@types/response-time": "^2.3.5",
+        "@typescript-eslint/eslint-plugin": "^5.23.0",
+        "@typescript-eslint/parser": "^5.23.0",
+        "eslint": "^8.15.0",
+        "eslint-config-prettier": "^8.5.0",
         "morgan": "^1.10.0",
+        "prettier": "^2.6.2",
         "ts-node": "^10.7.0",
         "typescript": "^4.6.4"
     }

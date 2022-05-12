@@ -21,7 +21,7 @@ app.use(responseTime())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-app.get("/", verifyAccessToken, async (req, res, next) => {
+app.get("/", verifyAccessToken, async (req, res) => {
     res.send("Hello from express.")
 })
 
@@ -34,7 +34,7 @@ app.use(async (req, res, next) => {
     next(new createError.NotFound())
 })
 
-const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
+const errorHandler: ErrorRequestHandler = (err, req, res) => {
     res.status(err.status || 500)
     res.send({
         error: {
