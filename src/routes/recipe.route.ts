@@ -1,13 +1,14 @@
 import express from "express"
-const router = express.Router()
-import { verifyAccessToken } from "../middlewares/auth.middleware"
 import {
     addRecipe,
+    deleteSingleRecipe,
     getRecipes,
     getSingleRecipe,
     updateSingleRecipe,
-    deleteSingleRecipe,
 } from "../controllers/recipe.controller"
+import { verifyAccessToken } from "../middlewares/auth.middleware"
+
+const router = express.Router()
 
 router.get("/", getRecipes)
 router.post("/", verifyAccessToken, addRecipe)

@@ -1,5 +1,5 @@
-import { Schema, model } from "mongoose"
-import { IRecipeReview, IRecipe } from "../types/recipe.types"
+import { model, Schema } from "mongoose"
+import { IRecipe, IRecipeReview } from "../types/recipe.types"
 
 const reviewSchema = new Schema<IRecipeReview>(
     {
@@ -51,6 +51,10 @@ const RecipeSchema = new Schema<IRecipe>(
         timestamps: true,
     }
 )
+
+RecipeSchema.set("toJSON", {
+    virtuals: true,
+})
 
 const Recipe = model("recipe", RecipeSchema)
 export default Recipe
