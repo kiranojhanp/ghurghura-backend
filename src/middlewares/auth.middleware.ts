@@ -21,7 +21,6 @@ const signAccessToken = (userId: string) => {
                 return
             }
             resolve(token)
-            // 0387952493452401 ramailo branch apsara bajagain
         })
     })
 }
@@ -46,7 +45,7 @@ const signRefreshToken = (userId: string) => {
         const payload = {}
         const secret = REFRESH_TOKEN_SECRET
         const options = {
-            expiresIn: "1y",
+            expiresIn: "1m",
             issuer: "www.ghurghura.com",
             audience: userId,
         }
@@ -59,7 +58,10 @@ const signRefreshToken = (userId: string) => {
             try {
                 // const saveResult = await SET_ASYNC(userId, token, "EX", 365 * 24 * 60 * 60)
 
-                const saveResult = await client.setEx(userId, 365 * 24 * 60 * 60, token as string)
+                // const saveResult = await client.setEx(userId, 365 * 24 * 60 * 60, token as string)
+
+                // add new refresh token to redis list
+                const saveResult = await client.rPush(`refreshTokens-${userId}`, [token as string])
 
                 if (saveResult) return resolve(token)
             } catch (err) {
@@ -73,13 +75,20 @@ const signRefreshToken = (userId: string) => {
 const verifyRefreshToken = (refreshToken: string) => {
     return new Promise((resolve, reject) => {
         JWT.verify(refreshToken, REFRESH_TOKEN_SECRET, async (err, payload: any) => {
-            if (err) return reject(new createError.Unauthorized())
+            if (err) {
+                return reject(new createError.Unauthorized())
+            }
+
             const userId = payload.aud
 
             try {
-                const getRefreshToken = await client.GET(userId)
+                const getRefreshTokenFromList = await client.lRange(`refreshTokens-${userId}`, 0, -1)
+                getRefreshTokenFromList.forEach((token) => {
+                    if (token === refreshToken) {
+                        return resolve(userId)
+                    }
+                })
 
-                if (refreshToken === getRefreshToken) return resolve(userId)
                 reject(new createError.Unauthorized())
             } catch (err) {
                 console.log(err.message)

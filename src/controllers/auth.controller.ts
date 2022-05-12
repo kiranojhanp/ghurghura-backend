@@ -80,6 +80,9 @@ const refreshToken = async (req: Request, res: Response, next: NextFunction) => 
         if (!refreshToken) throw new createError.BadRequest()
 
         const userId = (await verifyRefreshToken(refreshToken)) as string
+        // remove refresh token from list
+        // allow one refresh token to sign access token only once
+        await client.lRem(`refreshTokens-${userId}`, 0, refreshToken)
         const accessToken = await signAccessToken(userId)
         const refToken = await signRefreshToken(userId)
 
@@ -99,8 +102,10 @@ const logout = async (req: Request, res: Response, next: NextFunction) => {
         if (!refreshToken) throw new createError.BadRequest()
         const userId = (await verifyRefreshToken(refreshToken)) as string
 
-        const deleteRefreshToken = await client.DEL(userId)
-        if (!deleteRefreshToken) {
+        // remove refresh token from list
+        const removeRefreshToken = await client.lRem(`refreshTokens-${userId}`, 0, refreshToken)
+
+        if (!removeRefreshToken) {
             throw new createError.InternalServerError()
         }
 
@@ -121,10 +126,5 @@ const getProfile = async (req: Request, res: Response, next: NextFunction) => {
         next(error)
     }
 }
-
-// Flow for multi device
-// Add new refresh token along with old on every login
-// Remove old refresh token and add new on every /refresh-token
-// Remove old refresh token on every logout
 
 export { register, login, getProfile, refreshToken, logout, changePassword }
