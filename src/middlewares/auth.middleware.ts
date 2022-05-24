@@ -5,7 +5,7 @@ import { client } from "../helpers/init_redis"
 
 const { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } = process.env as { [key: string]: string }
 
-const signAccessToken = (userId: string) => {
+const signAccessToken = (userId: string): Promise<string> => {
     return new Promise((resolve, reject) => {
         const payload = {}
         const secret = ACCESS_TOKEN_SECRET
@@ -20,7 +20,7 @@ const signAccessToken = (userId: string) => {
                 reject(new createError.InternalServerError())
                 return
             }
-            resolve(token)
+            resolve(token as string)
         })
     })
 }
@@ -40,12 +40,12 @@ const verifyAccessToken = (req: Request, res: Response, next: NextFunction) => {
     })
 }
 
-const signRefreshToken = (userId: string) => {
+const signRefreshToken = (userId: string): Promise<string> => {
     return new Promise((resolve, reject) => {
         const payload = {}
         const secret = REFRESH_TOKEN_SECRET
         const options = {
-            expiresIn: "1m",
+            expiresIn: "1y",
             issuer: "www.ghurghura.com",
             audience: userId,
         }
@@ -56,14 +56,10 @@ const signRefreshToken = (userId: string) => {
             }
 
             try {
-                // const saveResult = await SET_ASYNC(userId, token, "EX", 365 * 24 * 60 * 60)
-
-                // const saveResult = await client.setEx(userId, 365 * 24 * 60 * 60, token as string)
-
                 // add new refresh token to redis list
                 const saveResult = await client.rPush(`refreshTokens-${userId}`, [token as string])
 
-                if (saveResult) return resolve(token)
+                if (saveResult) return resolve(token as string)
             } catch (err) {
                 console.log(err.message)
                 reject(new createError.InternalServerError())
@@ -72,7 +68,7 @@ const signRefreshToken = (userId: string) => {
     })
 }
 
-const verifyRefreshToken = (refreshToken: string) => {
+const verifyRefreshToken = (refreshToken: string): Promise<string> => {
     return new Promise((resolve, reject) => {
         JWT.verify(refreshToken, REFRESH_TOKEN_SECRET, async (err, payload: any) => {
             if (err) {
@@ -89,6 +85,7 @@ const verifyRefreshToken = (refreshToken: string) => {
                     }
                 })
 
+                await client.lRem(`refreshTokens-${userId}`, 0, refreshToken)
                 reject(new createError.Unauthorized())
             } catch (err) {
                 console.log(err.message)

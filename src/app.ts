@@ -4,7 +4,6 @@ import helmet from "helmet"
 import createError from "http-errors"
 import morgan from "morgan"
 import responseTime from "response-time"
-import { verifyAccessToken } from "./middlewares/auth.middleware"
 // routes
 import AuthRoute from "./routes/auth.route"
 import RecipeRoute from "./routes/recipe.route"
@@ -21,7 +20,7 @@ app.use(responseTime())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-app.get("/", verifyAccessToken, async (req, res) => {
+app.get("/", async (req, res) => {
     res.send("Hello from express.")
 })
 

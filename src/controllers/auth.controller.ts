@@ -79,7 +79,7 @@ const refreshToken = async (req: Request, res: Response, next: NextFunction) => 
         const { refreshToken } = req.body
         if (!refreshToken) throw new createError.BadRequest()
 
-        const userId = (await verifyRefreshToken(refreshToken)) as string
+        const userId = await verifyRefreshToken(refreshToken)
         // remove refresh token from list
         // allow one refresh token to sign access token only once
         await client.lRem(`refreshTokens-${userId}`, 0, refreshToken)
@@ -100,10 +100,11 @@ const logout = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { refreshToken } = req.body
         if (!refreshToken) throw new createError.BadRequest()
-        const userId = (await verifyRefreshToken(refreshToken)) as string
+        const userId = await verifyRefreshToken(refreshToken)
 
         // remove refresh token from list
         const removeRefreshToken = await client.lRem(`refreshTokens-${userId}`, 0, refreshToken)
+        console.log(removeRefreshToken)
 
         if (!removeRefreshToken) {
             throw new createError.InternalServerError()
