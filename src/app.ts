@@ -21,7 +21,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 app.get("/", async (req, res) => {
-    res.send("Hello stranger!, deployed using webhook!")
+    res.send("Hello stranger!, deployed using webhook! mm")
 })
 
 app.use("/auth", AuthRoute)
